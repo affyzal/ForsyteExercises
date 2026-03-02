@@ -14,12 +14,12 @@ The exercises are **frontend-focused** and live in `apps/web`. You should treat 
 
 #### Exercise 1 – Ask Forsyte
 
-- **Doc**: `[docs/exercise-1.md](docs/exercise-1.md)`
+- **Doc**: [docs/exercise-1.md](docs/exercise-1.md)
 - **Focus**: build the “Ask Forsyte” assistant layout in the frontend using mocked data (no real API calls).
 
 #### Exercise 2 – Ask Forsyte with backend integration
 
-- **Doc**: `[docs/exercise-2.md](docs/exercise-2.md)`
+- **Doc**: [docs/exercise-2.md](docs/exercise-2.md)
 - **Focus**: wire that layout to the real NestJS agent API in three stages (plain answers, markdown+resources, and multi-part answers).
 
 ### Quick start
