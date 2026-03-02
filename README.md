@@ -3,8 +3,24 @@
 This repository is a small monorepo used for frontend exercises on top of a realistic backend.
 
 - **Root**: orchestrates workspaces with Turbo and pnpm.
-- **`apps/api`**: NestJS + Prisma + Postgres API exposing agent and risk-related endpoints.
-- **`apps/web`**: Next.js frontend where candidates complete the exercises.
+- **apps/api**: NestJS + Prisma + Postgres API exposing agent and risk-related endpoints.
+- **apps/web**: Next.js frontend where candidates complete the exercises.
+
+### Exercises
+
+**Frontend**
+
+The exercises are **frontend-focused** and live in `apps/web`. You should treat the API (`apps/api`) as a stable backend.
+
+#### Exercise 1 – Ask Forsyte
+
+- **Doc**: `[docs/exercise-1.md](docs/exercise-1.md)`
+- **Focus**: build the “Ask Forsyte” assistant layout in the frontend using mocked data (no real API calls).
+
+#### Exercise 2 – Ask Forsyte with backend integration
+
+- **Doc**: `[docs/exercise-2.md](docs/exercise-2.md)`
+- **Focus**: wire that layout to the real NestJS agent API in three stages (plain answers, markdown+resources, and multi-part answers).
 
 ### Quick start
 
@@ -76,8 +92,8 @@ pnpm dev --filter web   # Next.js app on http://localhost:3891
 
 > **Non-standard ports**: This project deliberately uses ports **8174** (API) and **3891** (web) instead of the usual 8000/3000 to avoid clashing with other local projects that use the same tech stack. Make sure you use these ports when accessing the apps in your browser:
 >
-> - Web app: http://localhost:3891
-> - API / Swagger docs: http://localhost:8174/swagger
+> - Web app: [http://localhost:3891](http://localhost:3891)
+> - API / Swagger docs: [http://localhost:8174/swagger](http://localhost:8174/swagger)
 
 #### Tests and linting
 
@@ -96,13 +112,4 @@ pnpm lint --filter web
   - `password` (e.g. `beeCompliant33`)
 - Frontend calls to protected endpoints (including the Ask Forsyte agent routes) must send:
   - `Authorization: Bearer <accessToken>`
-
-### Candidate exercises
-
-The exercises are **frontend-only** and live in `apps/web`. You should treat the API (`apps/api`) as a stable backend.
-
-The main exercise docs are:
-
-- [`docs/exercise-1.md`](docs/exercise-1.md) – build the “Ask Forsyte” assistant layout in the frontend using mocked data (no real API calls).
-- [`docs/exercise-2.md`](docs/exercise-2.md) – wire that layout to the real NestJS agent API in three stages (plain answers, markdown+resources, and multi-part answers).
 
