@@ -10,9 +10,6 @@ export default function Home() {
       <p className="mt-2">
         API runs at <code className="rounded bg-black/10 px-1 py-0.5 dark:bg-white/10">http://localhost:8174</code> when you start the api app.
       </p>
-      <div className="mt-6 flex items-center gap-4">
-        <Spinner size={48} />
-      </div>
     </main>
   );
 }
