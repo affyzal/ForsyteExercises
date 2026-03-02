@@ -9,15 +9,131 @@ import { AgentMessageDto } from '@/modules/agent/presenters/http/dto/agent-messa
 import { AgentMessageRole } from '@/common/enums/agent-message-role.enum';
 import slugify from 'slugify';
 
-const WIRED_MODEL = 'forsyte.ask-forsyte-mock-1-alpha-v5';
-const UNWIRED_MODEL = 'anthropic.claude-sonnet-4-5-20250929-v1:0';
+type JourneyResource = {
+  rel: string;
+  href: string;
+};
 
-/** Journey steps: order matters. Incoming message is slugified and matched to the expected step slug. */
-const JOURNEY_STEPS = [
-  { slug: 'do-i-have-matters-in-high-risk-jurisdictions', answer: 'Yes, you have 12 matters in high-risk jurisdictions across three regions.' },
-  { slug: 'how-many-of-those-have-outstanding-risk-assessments', answer: 'Out of these, 5 matters currently have outstanding risk assessments.' },
-  { slug: 'show-the-risk-assessment-flags-for-the-beekeeper-employment-contract', answer: 'Here are the risk assessment flags for the Beekeeper employment contract: [flags to be wired from data].' },
-  { slug: 'summarise-the-matters-with-outstanding-items-and-suggest-next-steps', answer: 'Summary and suggested next steps: [to be wired from matter/outstanding data].' },
+type JourneyMeta = {
+  model: string;
+  finishReason: 'length' | 'stop';
+};
+
+type JourneyAnswerContent = {
+  text: string;
+  resources?: JourneyResource[];
+  meta?: JourneyMeta;
+};
+
+type JourneyContext = {
+  model: string;
+};
+
+type JourneyStep = {
+  slug: string;
+  buildAnswers: (context: JourneyContext) => JourneyAnswerContent[];
+};
+
+/** Journey steps: matched by slugified incoming text. Order of questions no longer matters. */
+const JOURNEY_STEPS: JourneyStep[] = [
+  {
+    slug: 'do-i-have-matters-in-high-risk-jurisdictions',
+    buildAnswers: (ctx) => [
+      {
+        text:
+          'Yes, you have 3 matters on your Forsyte book. Two of those matters have indicators that they may involve higher-risk jurisdictions based on their risk assessments.',
+        meta: {
+          model: ctx.model,
+          finishReason: 'stop',
+        },
+      },
+    ],
+  },
+  {
+    slug: 'how-many-of-those-have-outstanding-risk-assessments',
+    buildAnswers: (ctx) => [
+      {
+        text:
+          'Out of your 3 seeded matters, 2 currently have risk assessments in progress and 1 has a completed high-risk assessment.\n\nYou can review the outstanding matters and their assessments using the link below.',
+        resources: [
+          {
+            rel: 'mattersWithOutstandingRiskAssessments',
+            href: '/v1/matters?organisationSlug=forsyte&riskAssessmentStatus=in_progress',
+          },
+        ],
+        meta: {
+          model: ctx.model,
+          finishReason: 'stop',
+        },
+      },
+    ],
+  },
+  {
+    slug: 'show-the-risk-assessment-flags-for-the-beekeeper-employment-contract',
+    buildAnswers: (ctx) => [
+      {
+        text:
+          'Here are the seeded risk assessment flags for the Beekeeper employment contract:\n\n- Remote identity verification: accepted\n- Identity confidence: accepted\n- Sanctions screening: accepted\n- Adverse media: pending\n- High-risk third country residence: pending\n\nI will summarise what this means and suggested next steps next.',
+        resources: [
+          {
+            rel: 'riskAssessmentFlags',
+            href: '/v1/risk-assessments/{beekeeperRiskId}/flags',
+          },
+        ],
+        meta: {
+          model: ctx.model,
+          finishReason: 'length',
+        },
+      },
+      {
+        text:
+          'Overall, the Beekeeper employment contract has a completed, high-risk assessment driven mainly by remote onboarding and outstanding screening checks. Typical next steps would include resolving the pending identity and adverse media checks and documenting a clear risk-based rationale before proceeding.',
+        resources: [
+          {
+            rel: 'riskAssessmentDetails',
+            href: '/v1/risk-assessments/{beekeeperRiskId}',
+          },
+        ],
+        meta: {
+          model: ctx.model,
+          finishReason: 'stop',
+        },
+      },
+    ],
+  },
+  {
+    slug: 'summarise-the-matters-with-outstanding-items-and-suggest-next-steps',
+    buildAnswers: (ctx) => [
+      {
+        text:
+          'Across your seeded Forsyte matters, there are outstanding items on 2 in-progress risk assessments and one completed high-risk assessment on the Beekeeper employment contract. I will summarise the overall position and suggested next steps next.',
+        resources: [
+          {
+            rel: 'mattersWithOutstandingRiskAssessments',
+            href: '/v1/matters?organisationSlug=forsyte&riskAssessmentStatus=in_progress',
+          },
+        ],
+        meta: {
+          model: ctx.model,
+          finishReason: 'length',
+        },
+      },
+      {
+        text:
+          'In summary, you should (1) prioritise clearing outstanding risk assessment actions on the 2 in-progress matters, (2) review and document your position on the completed high-risk Beekeeper employment contract, and (3) ensure ownership of each matter is clear so follow-up reviews happen promptly.',
+        resources: [
+          {
+            rel: 'allSeededRiskAssessments',
+            href: '/v1/risk-assessments?organisationSlug=forsyte',
+          },
+        ],
+        meta: {
+          model: ctx.model,
+          finishReason: 'stop',
+        },
+      },
+    ],
+  },
 ] as const;
 
 @Injectable()
@@ -61,53 +177,60 @@ export class AgentService {
     }
 
     const { session, agent } = sessionWithAgent;
-    if (agent.model === UNWIRED_MODEL) {
-      throw new BadRequestException('This agent is not wired for conversations yet.');
-    }
-    if (agent.model !== WIRED_MODEL) {
-      throw new BadRequestException('Unsupported agent configuration.');
-    }
 
     const existingCount = await this.messageRepo.countBySessionId(sessionId);
-    const text = typeof content?.text === 'string' ? (content.text as string).trim() : '';
+    const text = typeof content?.text === 'string' ? content.text.trim() : '';
     if (!text) {
       throw new BadRequestException('Message content must include a non-empty text field.');
     }
-    const messageSlug = slugify(text);
+    const messageSlug = slugify(text, { lower: true });
 
-    const stepIndex = existingCount / 2;
-    if (stepIndex < 0 || stepIndex >= JOURNEY_STEPS.length) {
+    const step = JOURNEY_STEPS.find((s) => s.slug === messageSlug);
+    if (!step) {
       throw new BadRequestException(
-        `This mock conversation supports ${JOURNEY_STEPS.length} steps. Expected step ${stepIndex + 1}, but there are already ${existingCount} messages.`,
-      );
-    }
-
-    const step = JOURNEY_STEPS[stepIndex];
-    if (messageSlug !== step.slug) {
-      throw new BadRequestException(
-        `For step ${stepIndex + 1}, expected a message matching: "${step.slug}". Received slug: "${messageSlug || '(empty)'}".`,
+        `This mock conversation only supports specific seeded questions. Received slug: "${messageSlug || '(empty)'}".`,
       );
     }
 
     const userSequenceId = existingCount + 1;
-    const agentSequenceId = existingCount + 2;
-    const [, agentMessage] = await Promise.all([
-      this.messageRepo.create({
-        sessionId,
-        organisationId: session.organisationId,
-        role,
-        sequenceId: userSequenceId,
-        content: content ?? undefined,
-      }),
-      this.messageRepo.create({
+    const answers = step.buildAnswers({ model: agent.model });
+    if (!answers.length) {
+      throw new BadRequestException('Configured journey step did not provide any answers.');
+    }
+
+    const agentMessages: { id: string; sessionId: string; role: string; sequenceId: number; content: Record<string, unknown> | null; createdAt: Date }[] =
+      [];
+
+    const userMessagePromise = this.messageRepo.create({
+      sessionId,
+      organisationId: session.organisationId,
+      role,
+      sequenceId: userSequenceId,
+      content: content ?? undefined,
+    });
+
+    let nextSequenceId = userSequenceId + 1;
+    for (const answer of answers) {
+      // eslint-disable-next-line no-await-in-loop
+      const created = await this.messageRepo.create({
         sessionId,
         organisationId: session.organisationId,
         role: AgentMessageRole.Agent,
-        sequenceId: agentSequenceId,
-        content: { text: step.answer },
-      }),
-    ]);
-    return this.toMessageDto(agentMessage);
+        sequenceId: nextSequenceId,
+        content: {
+          text: answer.text,
+          ...(answer.resources && { resources: answer.resources }),
+          ...(answer.meta && { meta: answer.meta }),
+        },
+      });
+      agentMessages.push(created);
+      nextSequenceId += 1;
+    }
+
+    await userMessagePromise;
+
+    const lastAgentMessage = agentMessages.at(-1)!;
+    return this.toMessageDto(lastAgentMessage);
   }
 
   private toAgentDto(agent: { id: string; name: string; slug: string; description: string | null; createdAt: Date; updatedAt: Date }): AgentDto {
