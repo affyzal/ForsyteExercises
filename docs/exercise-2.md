@@ -17,6 +17,19 @@ This exercise builds on Exercise 1 by wiring your “Ask Forsyte” layout to th
 - API and database running and seeded:
   - `pnpm dev --filter api` (or `pnpm dev` from root).
   - `pnpm prisma:seed` from `apps/api` if needed.
+- Ability to log in to the API to obtain a JWT:
+  - `POST /auth/login` with a seeded user, for example:
+    - `email`: `buzz.aldrin@forsyte.co`
+    - `password`: `beeCompliant33`
+
+### Authentication
+
+- Implement a minimal login flow in `apps/web` so the user can enter email + password and obtain an access token from `POST /auth/login`.
+- Store the access token (e.g. in component state or a simple client-side store).
+- Send `Authorization: Bearer <accessToken>` on all Ask Forsyte agent calls:
+  - `GET /:organisationIdOrSlug/agents`
+  - `POST /:organisationIdOrSlug/agents/:agentId/sessions`
+  - `POST /:organisationIdOrSlug/agents/sessions/:sessionId/messages`
 
 ### Common agent API behaviour
 

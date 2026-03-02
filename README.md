@@ -66,6 +66,15 @@ The seed script creates:
 - A primary organisation (`forsyte`) with a small set of users, clients, matters, risk assessments, and risk flags.
 - A wired mock agent model (`forsyte.ask-forsyte-mock-1-alpha-v5`) and a demo agent session.
 
+### Authentication
+
+- The API is protected by JWT access tokens.
+- A public login endpoint is available at `POST /auth/login` and expects:
+  - `email` (e.g. `buzz.aldrin@forsyte.co`)
+  - `password` (e.g. `beeCompliant33`)
+- Frontend calls to protected endpoints (including the Ask Forsyte agent routes) must send:
+  - `Authorization: Bearer <accessToken>`
+
 ### Candidate exercises
 
 The exercises are **frontend-only** and live in `apps/web`. You should treat the API (`apps/api`) as a stable backend.

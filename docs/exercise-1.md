@@ -44,6 +44,7 @@ For this exercise, you should:
 - **Frontend only**:
   - Do not change `apps/api` code, schema, or seed data as part of the exercise.
   - Do not call the real API; use mocked data instead.
+  - You do **not** need to handle login or authentication in this exercise.
 - **Tooling**:
   - You may install small, standard client-side libraries if explicitly allowed; otherwise, prefer using what’s already in the repo.
 
