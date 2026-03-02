@@ -8,6 +8,12 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const port = Number(process.env.PORT) || 8000;
 
+  app.enableCors({
+    origin: ['http://localhost:3000'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+  });
+
   const config = new DocumentBuilder()
     .setTitle('API')
     .setVersion('1.0')
