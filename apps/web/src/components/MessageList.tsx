@@ -46,6 +46,7 @@ const EmptyState = () => {
           'Do I have matters in high risk jurisdictions?',
           'How many of those have outstanding risk assessments?',
           'Summarise the matters with outstanding items and suggest next steps',
+          'Show the risk assessment flags for the Beekeeper employment contract',
         ].map((suggestion) => (
           <p
             key={suggestion}

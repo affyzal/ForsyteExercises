@@ -137,9 +137,6 @@ const Home = () => {
     <div className="flex h-screen flex-col bg-stone-50">
       <header className="flex flex-shrink-0 items-center justify-between border-b border-stone-200 bg-white px-6 py-3.5">
         <div className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-stone-900 text-sm font-semibold text-white">
-            F
-          </div>
           <div>
             <h1 className="text-sm font-semibold text-stone-800">Ask Forsyte</h1>
             <p className="text-xs text-stone-400">AI legal assistant</p>
@@ -157,16 +154,14 @@ const Home = () => {
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 16 16"
+              viewBox="0 0 24 24"
               fill="currentColor"
-              className="h-3 w-3"
+              className="h-6 w-6"
             >
               <path
-                fillRule="evenodd"
-                d="M8 3.5c-.771 0-1.537.022-2.297.066a1.124 1.124 0 0 0-1.058 1.028l-.018.214a.75.75 0 1 1-1.495-.12l.018-.221a2.624 2.624 0 0 1 2.467-2.399 41.628 41.628 0 0 1 4.766 0 2.624 2.624 0 0 1 2.467 2.399l.056.662a.75.75 0 0 1-1.495.12l-.056-.662A1.124 1.124 0 0 0 10.297 3.566 40.7 40.7 0 0 0 8 3.5ZM6.81 6.813a.75.75 0 0 1 .814.68l.208 2.5a.75.75 0 1 1-1.494.125l-.208-2.5a.75.75 0 0 1 .68-.805Zm2.37 0a.75.75 0 0 1 .68.805l-.208 2.5a.75.75 0 1 1-1.494-.124l.208-2.5a.75.75 0 0 1 .815-.681Z"
-                clipRule="evenodd"
+                d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM21.41 6.34a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
               />
-              <path d="M2.265 4.227a.75.75 0 0 1 .809-.687l10.855 1.18a.75.75 0 0 1-.163 1.492L2.91 5.031a.75.75 0 0 1-.645-.804ZM3.5 9.75c0-.414.336-.75.75-.75h7.5a.75.75 0 0 1 0 1.5h-7.5a.75.75 0 0 1-.75-.75Zm.75 2.25a.75.75 0 0 0 0 1.5h7.5a.75.75 0 0 0 0-1.5h-7.5Z" />
+              <circle cx="18" cy="6" r="1" fill="#fff"/>
             </svg>
             New conversation
           </button>

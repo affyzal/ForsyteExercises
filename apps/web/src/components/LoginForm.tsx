@@ -124,6 +124,8 @@ const LoginForm = ({ onSuccess }: LoginFormProps) => {
         <p className="mt-4 text-center text-xs text-stone-400">
           Use a seeded account, e.g.{' '}
           <span className="font-mono text-stone-500">buzz.aldrin@forsyte.co</span>
+          <span className="mx-1 text-stone-300">/</span>
+          <span className="font-mono text-stone-500">beeCompliant33</span>
         </p>
       </div>
     </div>

@@ -10,10 +10,12 @@
   },
   "dependencies": {
     "@forsyteco/product-ui": "^0.0.13",
+    "@tailwindcss/typography": "^0.5.19",
     "axios": "^1.13.6",
     "next": "^15.0.3",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
+    "react-markdown": "^10.1.0",
     "tailwindcss": "^4.1.17"
   },
   "devDependencies": {
