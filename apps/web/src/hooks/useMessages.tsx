@@ -2,6 +2,16 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { Message } from '@/types/message'
 import { getSessionMessages, sendMessage, toMessage } from '@/lib/api'
 import axios from 'axios'
+import {
+  mockPlainText,                    // Stage A — plain text only
+  mockMarkdown,                     // Stage B — markdown bold/lists
+  mockWithRiskAssessments,          // Stage B — risk assessment table
+  mockWithMatters,                  // Stage B — matters table
+  mockWithUnresolvableResource,     // Stage B — placeholder href, link only
+  mockMultipartPlain,               // Stage C — length → stop, no resources
+  mockMultipartWithResources,       // Stage C — length → stop, unresolvable resources
+  mockMultipartWithResolvedResource // Stage C — length → stop, resolved resource table
+} from '@/fixtures/mock-conversation'
 
 const ORG_SLUG = 'forsyte'
 
