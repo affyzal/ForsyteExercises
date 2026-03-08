@@ -87,12 +87,13 @@ export const sendMessage = async (
   sessionId: string,
   text: string,
   token: string,
+  abortSignal?: AbortSignal,
 ): Promise<AgentMessageDto> => {
   try {
     const { data } = await apiClient.post<AgentMessageDto>(
       `/${orgSlug}/agents/sessions/${sessionId}/messages`,
       { role: 'user', content: { text } },
-      { headers: authHeaders(token) },
+      { headers: authHeaders(token), signal: abortSignal },
     );
     return data;
   } catch (err) {

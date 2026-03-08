@@ -21,18 +21,24 @@ const MessageInput = ({ onSend, disabled }: MessageInputProps) => {
 
   const canSend = value.trim().length > 0 && !disabled
 
-  function handleSend() {
+  const handleSend = () => {
     if (!canSend) return
     onSend(value.trim())
     setValue('')
   }
 
-  function handleKeyDown(e: KeyboardEvent<HTMLTextAreaElement>) {
+  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       handleSend()
     }
   }
+
+  useEffect(() => {
+    if (!disabled) {
+      textareaRef.current?.focus()
+    }
+  }, [disabled])
 
   return (
     <div className="border-t border-stone-200 bg-white px-4 py-3">

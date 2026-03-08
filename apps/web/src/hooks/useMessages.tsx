@@ -1,8 +1,7 @@
-'use client'
-
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { Message } from '@/types/message'
 import { sendMessage, toMessage } from '@/lib/api'
+import axios from 'axios'
 
 const ORG_SLUG = 'forsyte'
 
@@ -21,15 +20,18 @@ const useMessages = (
   const [messages, setMessages] = useState<Message[]>([])
   const [pending, setPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const abortControllerRef = useRef<AbortController | null>(null)
 
-  // Reset conversation when a new session starts
   useEffect(() => {
     setMessages([])
     setError(null)
+    return () => abortControllerRef.current?.abort()
   }, [sessionId])
 
 
   const handleSend = useCallback(async (text: string) => {
+    abortControllerRef.current?.abort()
+    abortControllerRef.current = new AbortController()
     if (!sessionId || !token) return
     setError(null)
 
@@ -62,6 +64,7 @@ const useMessages = (
           lastAgentMessage,
       ])
     } catch (err) {
+      if (axios.isCancel(err)) return
       setMessages((prev) => prev.filter((m) => m.id !== userMessage.id))
 
       const message = err instanceof Error ? err.message : 'Something went wrong. Please try again.'

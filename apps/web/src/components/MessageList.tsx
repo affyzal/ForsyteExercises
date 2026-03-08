@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { Message } from '@/types/message'
 import MessageBubble from '@/components/MessageBubble'
 
@@ -66,7 +66,10 @@ const MessageList = ({ messages, pending, onSuggestionClick }: MessageListProps)
   const bottomRef = useRef<HTMLDivElement>(null)
 
   // Sort by sequenceId as the source of truth for ordering
-  const sorted = [...messages].sort((a, b) => a.sequenceId - b.sequenceId)
+  const sorted = useMemo(
+    () => [...messages].sort((a, b) => a.sequenceId - b.sequenceId),
+    [messages]
+  )
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
