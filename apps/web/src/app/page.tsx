@@ -1,50 +1,67 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { Message } from '@/types/message'
-import { mockConversation, MOCK_SESSION_ID, MOCK_AGENT_MODEL } from '@/fixtures/mock-conversation'
 import MessageList from '@/components/MessageList'
 import MessageInput from '@/components/MessageInput'
+import LoginForm from '@/components/LoginForm'
+import { listAgents, createSession, sendMessage, toMessage } from '@/lib/api'
 
-// Mock agent replies for any new messages typed during the session.
-// In Exercise 2 this entire map is replaced by a real POST to the API.
-const MOCK_REPLIES: Omit<Message, 'id' | 'sessionId' | 'sequenceId' | 'createdAt' | 'role'>[] = [
-  {
-    content: {
-      text: 'I can help with that. For a full answer, please ask one of the suggested questions below.',
-      meta: { model: MOCK_AGENT_MODEL, finishReason: 'stop' },
-    },
-  },
-]
-
-let mockIdCounter = 100
-function nextMockId(): string {
-  return `agm_mock_${++mockIdCounter}`
-}
+const ORG_SLUG = 'forsyte'
 
 const Home = () => {
-  const [messages, setMessages] = useState<Message[]>(mockConversation)
+  const [token, setToken] = useState<string | null>(null)
+  const [sessionId, setSessionId] = useState<string | null>(null)
+  const [sessionLoading, setSessionLoading] = useState(false)
+  const [sessionError, setSessionError] = useState<string | null>(null)
+  const [messages, setMessages] = useState<Message[]>([])
   const [pending, setPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // The seam: in Exercise 2, replace this with a real createSession() call from api.ts.
-  function handleClear() {
-    if (pending) return
+  const bootstrapSession = useCallback(async (accessToken: string) => {
+    setSessionLoading(true)
+    setSessionError(null)
     setMessages([])
-    setError(null)
+
+    try {
+      const agents = await listAgents(ORG_SLUG, accessToken)
+      if (!agents.length) throw new Error('No agents found for this organisation.')
+
+      const agent = agents[0]
+      const session = await createSession(ORG_SLUG, agent.id, accessToken)
+      setSessionId(session.id)
+    } catch (err) {
+      setSessionError(
+        err instanceof Error
+          ? err.message
+          : 'Failed to start a session. Please try again.'
+      )
+    } finally {
+      setSessionLoading(false)
+    }
+  }, [])
+
+  const handleLoginSuccess = (accessToken: string) => {
+    setToken(accessToken)
+    bootstrapSession(accessToken)
   }
 
-  // The seam: in Exercise 2, replace this function body with real API calls.
-  async function handleSend(text: string) {
+  const handleClear = () => {
+    if (pending || sessionLoading || !token) return
+    bootstrapSession(token)
+  }
+
+  const handleSend = async (text: string) => {
+    if (!sessionId || !token) return
     setError(null)
 
     const now = new Date()
     const nextSequenceId = Math.max(...messages.map((m) => m.sequenceId), 0) + 1
 
-    // 1. Append user message immediately
+    // Optimistically append the user message
     const userMessage: Message = {
-      id: nextMockId(),
-      sessionId: MOCK_SESSION_ID,
+      id: `optimistic_${Date.now()}`,
+      sessionId,
       role: 'user',
       sequenceId: nextSequenceId,
       content: { text },
@@ -55,22 +72,17 @@ const Home = () => {
     setPending(true)
 
     try {
-      // 2. Simulate network delay
-      await new Promise((resolve) => setTimeout(resolve, 900))
+      const dto = await sendMessage(ORG_SLUG, sessionId, text, token)
+      const agentMessage = toMessage(dto)
 
-      // 3. Append mocked agent reply(s)
-      const agentMessages: Message[] = MOCK_REPLIES.map((template, i) => ({
-        ...template,
-        id: nextMockId(),
-        sessionId: MOCK_SESSION_ID,
-        role: 'agent' as const,
-        sequenceId: nextSequenceId + 1 + i,
-        createdAt: new Date(now.getTime() + (i + 1) * 1000),
-      }))
-
-      setMessages((prev) => [...prev, ...agentMessages])
+      // Replace optimistic user message with real sequenceId from API,
+      // then append the agent reply
+      setMessages((prev) => [
+        ...prev.filter((m) => m.id !== userMessage.id),
+        { ...userMessage, id: `user_${dto.sequenceId - 1}`, sequenceId: nextSequenceId },
+        agentMessage,
+      ])
     } catch (err) {
-      // Roll back the optimistically added user message on failure
       setMessages((prev) => prev.filter((m) => m.id !== userMessage.id))
       setError(
         err instanceof Error
@@ -82,9 +94,47 @@ const Home = () => {
     }
   }
 
+  if (!token) {
+    return <LoginForm onSuccess={handleLoginSuccess} />
+  }
+
+  if (sessionLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-stone-50">
+        <div className="flex flex-col items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-stone-900 text-sm font-semibold text-white">
+            F
+          </div>
+          <div className="flex items-center gap-2 text-sm text-stone-500">
+            <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-stone-300 border-t-stone-600" />
+            Starting session…
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (sessionError) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-stone-50 px-4">
+        <div className="flex w-full max-w-sm flex-col items-center gap-4 text-center">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-stone-900 text-sm font-semibold text-white">
+            F
+          </div>
+          <p className="text-sm text-stone-600">{sessionError}</p>
+          <button
+            onClick={() => token && bootstrapSession(token)}
+            className="rounded-lg bg-stone-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-stone-700"
+          >
+            Try again
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="flex h-screen flex-col bg-stone-50">
-      {/* Header */}
       <header className="flex flex-shrink-0 items-center justify-between border-b border-stone-200 bg-white px-6 py-3.5">
         <div className="flex items-center gap-3">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-stone-900 text-sm font-semibold text-white">
@@ -102,7 +152,7 @@ const Home = () => {
           </div>
           <button
             onClick={handleClear}
-            disabled={pending}
+            disabled={pending || sessionLoading}
             className="flex items-center gap-1.5 rounded-lg border border-stone-200 bg-white px-3 py-1.5 text-xs text-stone-500 transition-colors hover:border-stone-300 hover:text-stone-800 disabled:cursor-not-allowed disabled:opacity-40"
           >
             <svg
@@ -123,10 +173,8 @@ const Home = () => {
         </div>
       </header>
 
-      {/* Message feed */}
       <MessageList messages={messages} pending={pending} />
 
-      {/* Error banner */}
       {error && (
         <div className="mx-4 mb-2 flex items-center justify-between rounded-lg border border-red-200 bg-red-50 px-4 py-2.5">
           <div className="flex items-center gap-2">
@@ -154,8 +202,7 @@ const Home = () => {
         </div>
       )}
 
-      {/* Input */}
-      <MessageInput onSend={handleSend} disabled={pending} />
+      <MessageInput onSend={handleSend} disabled={pending || !sessionId} />
     </div>
   )
 }
