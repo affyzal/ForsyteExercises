@@ -57,7 +57,7 @@ const Home = () => {
         <ErrorBubble error={error} setError={setError} />
       )}
 
-      <MessageInput onSend={handleSend} disabled={pending || !sessionId} />
+      <MessageInput onSend={handleSend} disabled={pending || !sessionId || sessionLoading} />
     </div>
   )
 }
