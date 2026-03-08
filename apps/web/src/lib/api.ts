@@ -153,3 +153,31 @@ export const listRiskAssessments = async (
     return handleAxiosError(err)
   }
 }
+
+export type MatterDto = {
+  id: string
+  organisationId: string
+  clientId: string
+  reference: string
+  description: string
+  status: 'active' | 'closed' | 'pending'
+  type: string
+  ownedById: string
+  createdAt: string
+  updatedAt: string
+}
+
+export const listMatters = async (
+  orgSlug: string,
+  token: string,
+): Promise<MatterDto[]> => {
+  try {
+    const { data } = await apiClient.get<MatterDto[]>(
+      `/${orgSlug}/matters`,
+      { headers: authHeaders(token) },
+    )
+    return data
+  } catch (err) {
+    return handleAxiosError(err)
+  }
+}
