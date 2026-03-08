@@ -125,3 +125,31 @@ export const toMessage = (dto: AgentMessageDto): Message => ({
   content: dto.content,
   createdAt: new Date(dto.createdAt),
 });
+
+export type RiskAssessmentDto = {
+  id: string
+  organisationId: string
+  clientId: string
+  matterId: string
+  status: 'in_progress' | 'completed'
+  riskLevel?: 'low' | 'medium' | 'high'
+  description?: string
+  version: number
+  createdAt: string
+  updatedAt: string
+}
+
+export const listRiskAssessments = async (
+  orgSlug: string,
+  token: string,
+): Promise<RiskAssessmentDto[]> => {
+  try {
+    const { data } = await apiClient.get<RiskAssessmentDto[]>(
+      `/${orgSlug}/risk/assessments`,
+      { headers: authHeaders(token) },
+    )
+    return data
+  } catch (err) {
+    return handleAxiosError(err)
+  }
+}

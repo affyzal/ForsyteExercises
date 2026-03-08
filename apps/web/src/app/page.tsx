@@ -51,7 +51,7 @@ const Home = () => {
     <div className="flex h-screen flex-col bg-stone-50">
       <Header handleClear={() => handleClear(pending)} pending={pending} sessionLoading={sessionLoading} />
 
-      <MessageList messages={messages} pending={pending} onSuggestionClick={handleSend}/>
+      <MessageList messages={messages} pending={pending} onSuggestionClick={handleSend} token={token} />
 
       {error && (
         <ErrorBubble error={error} setError={setError} />

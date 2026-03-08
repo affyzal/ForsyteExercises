@@ -7,6 +7,7 @@ import MessageBubble from '@/components/MessageBubble'
 type MessageListProps = {
   messages: Message[]
   pending: boolean
+  token: string
   onSuggestionClick?: (suggestion: string) => void
 }
 
@@ -62,10 +63,9 @@ const EmptyState = ({ onSuggestionClick }: { onSuggestionClick?: (s: string) => 
   )
 }
 
-const MessageList = ({ messages, pending, onSuggestionClick }: MessageListProps) => {
+const MessageList = ({ messages, pending, token, onSuggestionClick }: MessageListProps) => {
   const bottomRef = useRef<HTMLDivElement>(null)
 
-  // Sort by sequenceId as the source of truth for ordering
   const sorted = useMemo(
     () => [...messages].sort((a, b) => a.sequenceId - b.sequenceId),
     [messages]
@@ -83,7 +83,7 @@ const MessageList = ({ messages, pending, onSuggestionClick }: MessageListProps)
     <div className="flex flex-1 flex-col overflow-y-auto px-4 py-6">
       <div className="mx-auto flex w-full max-w-2xl flex-col gap-4">
         {sorted.map((message) => (
-          <MessageBubble key={message.id} message={message} />
+          <MessageBubble key={message.id} message={message} token={token} />
         ))}
         {pending && <TypingIndicator />}
         <div ref={bottomRef} />

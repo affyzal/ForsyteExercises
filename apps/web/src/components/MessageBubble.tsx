@@ -3,9 +3,12 @@
 import ReactMarkdown from 'react-markdown'
 import { Message } from '@/types/message'
 import ResourceLinks from '@/components/ResourceLinks'
+import ResourceData from '@/components/ResourceData'
+import remarkGfm from 'remark-gfm'
 
 type MessageBubbleProps = {
   message: Message
+  token: string
 }
 
 const ForsyteAvatar = () => (
@@ -43,8 +46,10 @@ const UserBubble = ({ message }: { message: Message }) => (
   </div>
 )
 
-const AgentBubble = ({ message }: { message: Message }) => {
+const AgentBubble = ({ message, token }: { message: Message; token: string }) => {
   const isContinuing = message.content.meta?.finishReason === 'length'
+  const hasResources =
+    message.content.resources && message.content.resources.length > 0
 
   return (
     <div className="flex items-start gap-2.5">
@@ -56,14 +61,21 @@ const AgentBubble = ({ message }: { message: Message }) => {
             [&_p]:leading-relaxed [&_p]:mb-2 [&_p:last-child]:mb-0
             [&_ul]:list-disc [&_ul]:pl-4 [&_ul]:mb-2
             [&_ol]:list-decimal [&_ol]:pl-4 [&_ol]:mb-2
-            [&_li]:mb-0.5
+            [&_li]:mb-1
             [&_strong]:font-semibold [&_strong]:text-stone-900
             [&_code]:rounded [&_code]:bg-stone-100 [&_code]:px-1 [&_code]:py-0.5 [&_code]:text-xs [&_code]:text-stone-700
-            [&_a]:text-stone-700 [&_a]:underline">
-            <ReactMarkdown>{message.content.text}</ReactMarkdown>
+            [&_pre]:bg-stone-900 [&_pre]:text-stone-100 [&_pre]:p-3 [&_pre]:rounded [&_pre]:overflow-x-auto
+            [&_a]:text-stone-700 [&_a]:underline"
+          >
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {message.content.text}
+            </ReactMarkdown>
           </div>
-          {message.content.resources && message.content.resources.length > 0 && (
-            <ResourceLinks resources={message.content.resources} />
+          {hasResources && (
+            <>
+              <ResourceLinks resources={message.content.resources!} />
+              <ResourceData resources={message.content.resources!} token={token} />
+            </>
           )}
           {isContinuing && <ContinuationIndicator />}
         </div>
@@ -80,11 +92,11 @@ const AgentBubble = ({ message }: { message: Message }) => {
   )
 }
 
-const MessageBubble = ({ message }: MessageBubbleProps) => {
+const MessageBubble = ({ message, token }: MessageBubbleProps) => {
   if (message.role === 'user') {
     return <UserBubble message={message} />
   }
-  return <AgentBubble message={message} />
+  return <AgentBubble message={message} token={token} />
 }
 
 export default MessageBubble
