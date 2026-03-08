@@ -2,21 +2,18 @@
 
 import { useEffect, useMemo, useRef } from 'react'
 import { Message } from '@/types/message'
-import MessageBubble from '@/components/MessageBubble'
+import MessageBubble, { ForsyteAvatar } from '@/components/MessageBubble'
 
 type MessageListProps = {
   messages: Message[]
   pending: boolean
-  token: string
   onSuggestionClick?: (suggestion: string) => void
 }
 
 const TypingIndicator = () => {
   return (
     <div className="flex items-start gap-2.5">
-      <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-stone-900 text-xs font-semibold tracking-tight text-white">
-        F
-      </div>
+      <ForsyteAvatar />
       <div>
         <p className="mb-1 text-xs font-medium text-stone-500">Forsyte</p>
         <div className="rounded-2xl rounded-tl-sm border border-stone-200 bg-white px-4 py-3 shadow-sm">
@@ -34,9 +31,7 @@ const TypingIndicator = () => {
 const EmptyState = ({ onSuggestionClick }: { onSuggestionClick?: (s: string) => void }) => {
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-3 px-8 text-center">
-      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-stone-900 text-lg font-semibold text-white">
-        F
-      </div>
+      <ForsyteAvatar />
       <div>
         <p className="text-sm font-medium text-stone-700">Ask Forsyte anything</p>
         <p className="mt-0.5 text-xs text-stone-400">
@@ -63,7 +58,7 @@ const EmptyState = ({ onSuggestionClick }: { onSuggestionClick?: (s: string) => 
   )
 }
 
-const MessageList = ({ messages, pending, token, onSuggestionClick }: MessageListProps) => {
+const MessageList = ({ messages, pending, onSuggestionClick }: MessageListProps) => {
   const bottomRef = useRef<HTMLDivElement>(null)
 
   const sorted = useMemo(
@@ -83,7 +78,7 @@ const MessageList = ({ messages, pending, token, onSuggestionClick }: MessageLis
     <div className="flex flex-1 flex-col overflow-y-auto px-4 py-6">
       <div className="mx-auto flex w-full max-w-2xl flex-col gap-4">
         {sorted.map((message) => (
-          <MessageBubble key={message.id} message={message} token={token} />
+          <MessageBubble key={message.id} message={message} />
         ))}
         {pending && <TypingIndicator />}
         <div ref={bottomRef} />

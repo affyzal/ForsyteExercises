@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { listRiskAssessments, listMatters, RiskAssessmentDto, MatterDto } from '@/lib/api'
 import { MessageResource } from '@/types/message'
+import { useSessionContext } from '@/context/SessionContext'
 
 type ResourceDataProps = {
   resources: MessageResource[]
@@ -107,9 +108,10 @@ const isRiskAssessmentHref = (href: string) =>
 
 const isMatterHref = (href: string) => href.includes('/matters')
 
-const ResourceData = ({ resources, token }: ResourceDataProps) => {
+const ResourceData = ({ resources }: ResourceDataProps) => {
   const [data, setData] = useState<ResourceResult | null>(null)
   const [loading, setLoading] = useState(false)
+  const { token } =useSessionContext()
 
   useEffect(() => {
     const resolvable = resources.find((r) => isResolvable(r.href))

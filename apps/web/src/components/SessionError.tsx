@@ -1,10 +1,12 @@
+import { useSessionContext } from "@/context/SessionContext"
+
 type SessionErrorProps = {
   sessionError: string | null
   loadSession: (token: string) => void
-  token: string | null
 }
 
-const SessionError = ({ sessionError, loadSession, token }: SessionErrorProps) => {
+const SessionError = ({ sessionError, loadSession }: SessionErrorProps) => {
+  const { token } = useSessionContext()
   return (
     <div className="flex h-screen items-center justify-center bg-stone-50 px-4">
       <div className="flex w-full max-w-sm flex-col items-center gap-4 text-center">

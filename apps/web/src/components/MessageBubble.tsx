@@ -11,7 +11,7 @@ type MessageBubbleProps = {
   token: string
 }
 
-const ForsyteAvatar = () => (
+export const ForsyteAvatar = () => (
   <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-stone-900 text-xs font-semibold tracking-tight text-white">
     F
   </div>
@@ -46,7 +46,7 @@ const UserBubble = ({ message }: { message: Message }) => (
   </div>
 )
 
-const AgentBubble = ({ message, token }: { message: Message; token: string }) => {
+const AgentBubble = ({ message }: { message: Message }) => {
   const isContinuing = message.content.meta?.finishReason === 'length'
   const hasResources =
     message.content.resources && message.content.resources.length > 0
@@ -74,7 +74,7 @@ const AgentBubble = ({ message, token }: { message: Message; token: string }) =>
           {hasResources && (
             <>
               <ResourceLinks resources={message.content.resources!} />
-              <ResourceData resources={message.content.resources!} token={token} />
+              <ResourceData resources={message.content.resources!} />
             </>
           )}
           {isContinuing && <ContinuationIndicator />}
@@ -96,7 +96,7 @@ const MessageBubble = ({ message, token }: MessageBubbleProps) => {
   if (message.role === 'user') {
     return <UserBubble message={message} />
   }
-  return <AgentBubble message={message} token={token} />
+  return <AgentBubble message={message} />
 }
 
 export default MessageBubble
