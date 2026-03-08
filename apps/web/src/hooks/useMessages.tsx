@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { Message } from '@/types/message'
-import { sendMessage, toMessage } from '@/lib/api'
+import { getSessionMessages, sendMessage, toMessage } from '@/lib/api'
 import axios from 'axios'
 
 const ORG_SLUG = 'forsyte'
@@ -63,6 +63,13 @@ const useMessages = (
           realUserMessage,
           lastAgentMessage,
       ])
+
+      /*
+      await sendMessage(ORG_SLUG, sessionId, text, token)
+      const allDtos = await getSessionMessages(ORG_SLUG, sessionId, token)
+      setMessages(allDtos.map(toMessage))
+      */
+
     } catch (err) {
       if (axios.isCancel(err)) return
       setMessages((prev) => prev.filter((m) => m.id !== userMessage.id))

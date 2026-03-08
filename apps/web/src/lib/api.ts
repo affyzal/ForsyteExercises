@@ -1,6 +1,7 @@
 import axios, { AxiosError } from 'axios';
 import { Message, MessageRole } from '@/types/message';
 
+// --- API client setup ---
 const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8174',
   headers: { 'Content-Type': 'application/json' },
@@ -8,10 +9,12 @@ const apiClient = axios.create({
 
 // --- Shared ---
 
+// Helper to attach auth header
 const authHeaders = (token: string) => ({
   Authorization: `Bearer ${token}`,
 });
 
+// Centralized error handling for API calls
 const handleAxiosError = (err: unknown): never => {
   if (err instanceof AxiosError) {
     const message = err.response?.data?.message;
@@ -50,7 +53,7 @@ export type AgentMessageDto = {
 };
 
 // --- API functions ---
-
+// list agents for an organisation - used to get the agent ID needed to start a session
 export const listAgents = async (
   orgSlug: string,
   token: string,
@@ -65,6 +68,7 @@ export const listAgents = async (
   }
 };
 
+// create a new session for an agent, returning the session details including the session ID which is needed for sending messages and fetching conversation history
 export const createSession = async (
   orgSlug: string,
   agentId: string,
@@ -82,6 +86,7 @@ export const createSession = async (
   }
 };
 
+// send a message and get the full message object with id, timestamps, etc. back from the API
 export const sendMessage = async (
   orgSlug: string,
   sessionId: string,
@@ -101,6 +106,7 @@ export const sendMessage = async (
   }
 };
 
+//  get all messages for a session (used in the comment in useMessages)
 export const getSessionMessages = async (
   orgSlug: string,
   sessionId: string,
@@ -117,6 +123,7 @@ export const getSessionMessages = async (
   }
 };
 
+// --- Helpers ---
 export const toMessage = (dto: AgentMessageDto): Message => ({
   id: dto.id,
   sessionId: dto.sessionId,
@@ -139,6 +146,7 @@ export type RiskAssessmentDto = {
   updatedAt: string
 }
 
+// Example function to list risk assessments, which could be used in the resource link for outstanding risk assessments in the mock conversation
 export const listRiskAssessments = async (
   orgSlug: string,
   token: string,
@@ -167,6 +175,7 @@ export type MatterDto = {
   updatedAt: string
 }
 
+// Example function to list matters, which could be used in the resource link for matters in the mock conversation
 export const listMatters = async (
   orgSlug: string,
   token: string,
