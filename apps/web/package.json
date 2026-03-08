@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@forsyteco/product-ui": "^0.0.13",
+    "axios": "^1.13.6",
     "next": "^15.0.3",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
