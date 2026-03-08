@@ -3,6 +3,16 @@ import { Message } from '@/types/message'
 export const MOCK_SESSION_ID = 'ags_mock_session_001'
 export const MOCK_AGENT_MODEL = 'ai-agent-forsyte-preview'
 
+// list of all examples
+// mockPlainText,                    // Stage A — plain text only
+// mockMarkdown,                     // Stage B — markdown bold/lists
+// mockWithRiskAssessments,          // Stage B — risk assessment table
+// mockWithMatters,                  // Stage B — matters table
+// mockWithUnresolvableResource,     // Stage B — placeholder href, link only
+// mockMultipartPlain,               // Stage C — length → stop, no resources
+// mockMultipartWithResources,       // Stage C — length → stop, unresolvable resources
+// mockMultipartWithResolvedResource,     // Stage C — length → stop, resolvable resource
+
 // --- Stage A: Plain text response ---
 export const mockPlainText: Message[] = [
   {
