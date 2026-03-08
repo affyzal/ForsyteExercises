@@ -63,11 +63,26 @@ const useMessages = (
       ])
     } catch (err) {
       setMessages((prev) => prev.filter((m) => m.id !== userMessage.id))
-      setError(
-        err instanceof Error
-          ? err.message
-          : 'Something went wrong. Please try again.'
-      )
+
+      const message = err instanceof Error ? err.message : 'Something went wrong. Please try again.'
+      const isUnsupported = message.toLowerCase().includes('seeded')
+
+      if (isUnsupported) {
+        setMessages((prev) => [
+          ...prev.filter((m) => m.id !== userMessage.id),
+          { ...userMessage, id: `user_${nextSequenceId}`, sequenceId: nextSequenceId },
+          {
+            id: `agent_unsupported_${Date.now()}`,
+            sessionId: sessionId!,
+            role: 'agent',
+            sequenceId: nextSequenceId + 1,
+            content: { text: 'I can only answer questions about your active matters and risk assessments. Try asking about high-risk jurisdictions, outstanding risk assessments, or specific contract flags.' },
+            createdAt: new Date(),
+          },
+        ])
+      } else {
+        setError(message)
+      }
     } finally {
       setPending(false)
     }

@@ -11,7 +11,7 @@ const Header = ({ handleClear, pending, sessionLoading } : { handleClear: () => 
         <button
           onClick={handleClear}
           disabled={pending || sessionLoading}
-          className="flex items-center gap-1.5 rounded-lg border border-stone-200 bg-white px-3 py-1.5 text-xs text-stone-500 transition-colors hover:border-stone-300 hover:text-stone-800 disabled:cursor-not-allowed disabled:opacity-40"
+          className="flex items-center gap-1.5 rounded-lg border border-stone-200 bg-white px-3 py-1.5 text-xs text-stone-500 transition-colors hover:border-stone-300 hover:text-stone-800 disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

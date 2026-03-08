@@ -7,6 +7,7 @@ import MessageBubble from '@/components/MessageBubble'
 type MessageListProps = {
   messages: Message[]
   pending: boolean
+  onSuggestionClick?: (suggestion: string) => void
 }
 
 const TypingIndicator = () => {
@@ -29,7 +30,7 @@ const TypingIndicator = () => {
   )
 }
 
-const EmptyState = () => {
+const EmptyState = ({ onSuggestionClick }: { onSuggestionClick?: (s: string) => void }) => {
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-3 px-8 text-center">
       <div className="flex h-12 w-12 items-center justify-center rounded-full bg-stone-900 text-lg font-semibold text-white">
@@ -48,19 +49,20 @@ const EmptyState = () => {
           'Summarise the matters with outstanding items and suggest next steps',
           'Show the risk assessment flags for the Beekeeper employment contract',
         ].map((suggestion) => (
-          <p
+          <button
             key={suggestion}
-            className="rounded-lg border border-stone-200 bg-stone-50 px-3 py-1.5 text-xs text-stone-500 italic"
+            onClick={() => onSuggestionClick?.(suggestion)}
+            className="rounded-lg border border-stone-200 bg-stone-50 px-3 py-1.5 text-xs text-stone-500 italic cursor-pointer hover:bg-stone-100 hover:text-stone-700 transition-colors"
           >
             "{suggestion}"
-          </p>
+          </button>
         ))}
       </div>
     </div>
   )
 }
 
-const MessageList = ({ messages, pending }: MessageListProps) => {
+const MessageList = ({ messages, pending, onSuggestionClick }: MessageListProps) => {
   const bottomRef = useRef<HTMLDivElement>(null)
 
   // Sort by sequenceId as the source of truth for ordering
@@ -71,7 +73,7 @@ const MessageList = ({ messages, pending }: MessageListProps) => {
   }, [messages, pending])
 
   if (sorted.length === 0 && !pending) {
-    return <EmptyState />
+    return <EmptyState onSuggestionClick={onSuggestionClick} />
   }
 
   return (

@@ -60,7 +60,7 @@ const MessageInput = ({ onSend, disabled }: MessageInputProps) => {
           aria-label="Send message"
           className={`mb-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg transition-all ${
             canSend
-              ? 'bg-stone-900 text-white hover:bg-stone-700 active:scale-95'
+              ? 'bg-stone-900 text-white hover:bg-stone-700 active:scale-95 cursor-pointer'
               : 'bg-stone-100 text-stone-300 cursor-not-allowed'
           }`}
         >

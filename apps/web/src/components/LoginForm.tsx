@@ -127,7 +127,7 @@ const LoginForm = ({ onSuccess }: LoginFormProps) => {
             <button
               onClick={handleSubmit}
               disabled={pending || !email.trim() || !password.trim()}
-              className="flex items-center justify-center gap-2 rounded-lg bg-stone-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-stone-700 disabled:cursor-not-allowed disabled:opacity-40"
+              className="flex cursor-pointer items-center justify-center gap-2 rounded-lg bg-stone-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-stone-700 disabled:cursor-not-allowed disabled:opacity-40"
             >
               {pending ? (
                 <>
