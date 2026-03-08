@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
 import { Message } from '@/types/message'
 import MessageBubble, { ForsyteAvatar } from '@/components/MessageBubble'
 
@@ -66,7 +66,7 @@ const MessageList = ({ messages, pending, onSuggestionClick }: MessageListProps)
     [messages]
   )
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, pending])
 

@@ -92,7 +92,7 @@ const AgentBubble = ({ message }: { message: Message }) => {
   )
 }
 
-const MessageBubble = ({ message, token }: MessageBubbleProps) => {
+const MessageBubble = ({ message }: MessageBubbleProps) => {
   if (message.role === 'user') {
     return <UserBubble message={message} />
   }
