@@ -12,6 +12,9 @@ export const MOCK_AGENT_MODEL = 'ai-agent-forsyte-preview'
 // mockMultipartPlain,               // Stage C — length → stop, no resources
 // mockMultipartWithResources,       // Stage C — length → stop, unresolvable resources
 // mockMultipartWithResolvedResource,     // Stage C — length → stop, resolvable resource
+// mockConversation                     // Full mock conversation with a variety of message types, used in the comment in useMessages
+
+// This file contains a variety of mock messages that can be used to test different rendering scenarios in the UI, such as plain text, markdown formatting, resource links (resolvable and unresolvable), and multi-part messages. The full conversation at the end combines all of these elements to simulate a realistic interaction with the agent. You can import and use any of these message arrays in your components or hooks to test specific cases or the overall conversation flow.
 
 // --- Stage A: Plain text response ---
 export const mockPlainText: Message[] = [

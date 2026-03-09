@@ -10,7 +10,8 @@ import {
   mockWithUnresolvableResource,     // Stage B — placeholder href, link only
   mockMultipartPlain,               // Stage C — length → stop, no resources
   mockMultipartWithResources,       // Stage C — length → stop, unresolvable resources
-  mockMultipartWithResolvedResource // Stage C — length → stop, resolved resource table
+  mockMultipartWithResolvedResource, // Stage C — length → stop, resolved resource table
+  mockConversation                  // Full mock conversation with a variety of message types 
 } from '@/fixtures/mock-conversation'
 
 const ORG_SLUG = 'forsyte'
@@ -33,6 +34,7 @@ const useMessages = (
   const abortControllerRef = useRef<AbortController | null>(null)
 
   useEffect(() => {
+    // For testing purposes, we can set the messages to a mock conversation when the sessionId changes..
     setMessages([])
     setError(null)
     return () => abortControllerRef.current?.abort()
