@@ -7,7 +7,6 @@ import { useSessionContext } from '@/context/SessionContext'
 
 type ResourceDataProps = {
   resources: MessageResource[]
-  token: string
 }
 
 type ResourceResult =

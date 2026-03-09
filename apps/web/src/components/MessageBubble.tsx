@@ -8,7 +8,6 @@ import remarkGfm from 'remark-gfm'
 
 type MessageBubbleProps = {
   message: Message
-  token: string
 }
 
 export const ForsyteAvatar = () => (
